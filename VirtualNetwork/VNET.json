@@ -1,0 +1,57 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string"
+        },
+        "VNetName": {
+            "type": "string"
+        },
+        "addressSpaces": {
+            "type": "array"
+        },
+        "subnetConfiguration": {
+            "type": "array"
+        },
+        "tags": {
+            "type": "object",
+            "defaultValue": {}
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "name": "[parameters('VNetName')]",
+            "type": "Microsoft.Network/VirtualNetworks",
+            "apiVersion": "2020-06-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [],
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": "[parameters('addressSpaces')]",
+                },
+                "copy": [
+                    {
+                        "name": "subnets",
+                        "count": "[length(parameters('subnetConfiguration'))]",
+                        "input": {
+                            "name": "[parameters('subnetConfiguration')[copyIndex('subnets')].name]",
+                            "properties": {
+                                "addressPrefix": "[parameters('subnetconfiguration')[copyIndex('subnets')].addressRange]",
+                                "privateEndpointNetworkPolicies": "Disabled"
+                            }
+                        }
+                    }
+                ],
+                "dhcpOptions": {
+                    "dnsServers": [
+                      "10.159.250.20",
+                      "10.159.250.21"
+                    ]
+                }
+            }
+        }
+    ]
+}
